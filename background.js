@@ -1,4 +1,4 @@
-let discordPort,youtubePort,soundcloudPort,plexPort,source="custom"
+let discordPort,youtubePort,youtubeMusicPort,soundcloudPort,plexPort,source="custom"
 const resetActivity=()=>{
 	if(discordPort!==undefined)
 	{
@@ -29,7 +29,11 @@ chrome.runtime.onConnect.addListener(port=>{
 			discordPort=undefined
 			if(source=="youtube"&&youtubePort!==undefined)
 			{
-				youtubePort.postMessage({listen:false})
+				youtubePort.postMessage({listen:false});
+			}
+			if(source=="youtubemusic"&&youtubeMusicPort!==undefined)
+			{				
+				youtubeMusicPort.postMessage({listen:false});
 			}
 		})
 		if(source=="off")
@@ -43,6 +47,9 @@ chrome.runtime.onConnect.addListener(port=>{
 		else if(source=="youtube"&&youtubePort!==undefined)
 		{
 			youtubePort.postMessage({listen:true})
+		}else if(source=="youtubemusic"&&youtubeMusicPort!==undefined)
+		{
+			youtubeMusicPort.postMessage({listen:true})
 		}
 		else if(source=="soundcloud"&&soundcloudPort!==undefined)
 		{
@@ -73,6 +80,27 @@ chrome.runtime.onConnect.addListener(port=>{
 		if(source=="youtube"&&discordPort!==undefined)
 		{
 			youtubePort.postMessage({listen:true})
+		}
+	}else if(port.name=="youtubemusic")
+	{
+		if(youtubeMusicPort!==undefined)
+		{
+			youtubeMusicPort.postMessage({action:"close"})
+			youtubeMusicPort.disconnect()
+		}
+		youtubeMusicPort=port
+		console.info("YouTube Music port opened")
+		port.onDisconnect.addListener(()=>{
+			console.info("YouTube Music port closed")
+			youtubeMusicPort=undefined
+			if(source=="youtubemusic")
+			{
+				resetActivity()
+			}
+		})
+		if(source=="youtubemusic"&&discordPort!==undefined)
+		{
+			youtubeMusicPort.postMessage({listen:true})
 		}
 	}
 	else if(port.name=="soundcloud")
@@ -132,77 +160,99 @@ chrome.runtime.onMessage.addListener((request,sender,sendResponse)=>{
 		switch(request.action)
 		{
 			case"ports":
-			sendResponse({
-				discord:discordPort!==undefined,
-				youtube:youtubePort!==undefined,
-				soundcloud:soundcloudPort!==undefined,
-				plex:plexPort!==undefined
-			})
-			break;
+				sendResponse({
+					discord:discordPort!==undefined,
+					youtube:youtubePort!==undefined,
+					youtubemusic:youtubeMusicPort!==undefined,
+					soundcloud:soundcloudPort!==undefined,
+					plex:plexPort!==undefined
+				})
+				break;
 
 			case"source":
-			console.assert(request.source!==undefined)
-			source=request.source
-			chrome.storage.local.set({"source":source})
-			if(source=="off")
-			{
-				resetActivity()
-			}
-			if(source=="youtube")
-			{
-				if(youtubePort!==undefined)
-				{
-					youtubePort.postMessage({listen:true})
-				}
-				else
+				console.assert(request.source!==undefined)
+				source=request.source
+				chrome.storage.local.set({"source":source})
+
+				if(source=="off")
 				{
 					resetActivity()
 				}
-			}
-			else if(youtubePort!==undefined)
-			{
-				youtubePort.postMessage({listen:false})
-			}
-			if(source=="soundcloud")
-			{
-				if(soundcloudPort!==undefined)
+
+				if(source=="youtube")
 				{
-					soundcloudPort.postMessage({listen:true})
+					if(youtubePort!==undefined)
+					{
+						youtubePort.postMessage({listen:true})
+					}
+					else
+					{
+						resetActivity()
+					}
 				}
-				else
+				else if(youtubePort!==undefined)
 				{
-					resetActivity()
-				}
-			}
-			else if(soundcloudPort!==undefined)
-			{
-				soundcloudPort.postMessage({listen:false})
-			}
-			if(source=="plex")
-			{
-				if(plexPort!==undefined)
+					youtubePort.postMessage({listen:false})
+				}	
+
+				if(source=="youtubemusic")
 				{
-					plexPort.postMessage({listen:true})
+					if(youtubeMusicPort!==undefined)
+					{
+						youtubeMusicPort.postMessage({listen:true})
+					}
+					else
+					{
+						resetActivity()
+					}
 				}
-				else
+				else if(youtubeMusicPort!==undefined)
 				{
-					resetActivity()
+					youtubeMusicPort.postMessage({listen:false})
 				}
-			}
-			else if(plexPort!==undefined)
-			{
-				plexPort.postMessage({listen:false})
-			}
-			sendResponse()
-			break;
+
+				if(source=="soundcloud")
+				{
+					if(soundcloudPort!==undefined)
+					{
+						soundcloudPort.postMessage({listen:true})
+					}
+					else
+					{
+						resetActivity()
+					}
+				}
+				else if(soundcloudPort!==undefined)
+				{
+					soundcloudPort.postMessage({listen:false})
+				}
+
+				if(source=="plex")
+				{
+					if(plexPort!==undefined)
+					{
+						plexPort.postMessage({listen:true})
+					}
+					else
+					{
+						resetActivity()
+					}
+				}
+				else if(plexPort!==undefined)
+				{
+					plexPort.postMessage({listen:false})
+				}
+				
+				sendResponse()
+				break;
 
 			case"reset":
-			resetActivity()
-			sendResponse()
-			break;
+				resetActivity()
+				sendResponse()
+				break;
 
 			default:
-			console.error("Unknown action",request.action)
+				console.error("Unknown action",request.action)
 		}
 	}
 	else

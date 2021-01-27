@@ -38,6 +38,14 @@
 			"run_at": "document_idle"
 		},
 		{
+			"matches": ["https://music.youtube.com/*"],
+			"js": [
+				"youtube-music.js",
+				"content_script.js"
+			],
+			"run_at": "document_idle"
+		},
+		{
 			"matches": ["https://soundcloud.com/*"],
 			"js": [
 				"soundcloud.js",
