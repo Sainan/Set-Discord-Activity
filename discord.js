@@ -9,7 +9,8 @@ const injectionCode=()=>{
 		activityDetails:"",
 		activityState:"",
 		activityPartyCur:"",
-		activityPartyMax:""
+		activityPartyMax:"",
+		activityTimestamps: ""
 	}
 	window.WebSocket=function(u,p)
 	{
@@ -84,6 +85,12 @@ const injectionCode=()=>{
 			{
 				activity.party={size:[window.SetDiscordActivityData.activityPartyCur,window.SetDiscordActivityData.activityPartyMax]}
 			}
+	        if(window.SetDiscordActivityData.activityTimestamps!="") {
+	            activity.timestamps = {
+	                start: Date.now()
+	                }
+	        }
+	       
 			if(window.SetDiscordActivityData.activityDetails)
 			{
 				activity.details=window.SetDiscordActivityData.activityDetails
@@ -136,7 +143,8 @@ port.onMessage.addListener(msg=>{
 			activityDetails:\"`+encodeString(msg.details)+`\",
 			activityState:\"`+encodeString(msg.state)+`\",
 			activityPartyCur:\"`+encodeString(msg.partycur)+`\",
-			activityPartyMax:\"`+encodeString(msg.partymax)+`\"
+			activityPartyMax:\"`+encodeString(msg.partymax)+`\",
+			activityTimestamps: `+Date.now()+`
 		}`)
 	}
 })
