@@ -26,6 +26,9 @@
 	"activityTypeCustomStatus": {
 		"message": "Status Personalizado"
 	},
+        "activityTypeCompeting": {
+                "message": "Competindo"
+        },
 	"activityUpdate": {
 		"message": "Definir atividade de Discord"
 	},
