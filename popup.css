@@ -8,15 +8,15 @@ body
 button
 {
 	border: 5px solid #7289DA;
-	background: #7289DA;
+	background: #5865F2;
 	color: white;
 }
 
 #type
 {
 	width:50px
-	border: 5px solid #7289DA;
-	background: #7289DA;
+	border: 5px solid #5865F2;
+	background: #5865F2;
 	color: white;
 }
 
@@ -37,8 +37,8 @@ button
 
 #source
 {
-	border: 5px solid #7289DA;
-	background: #7289DA;
+	border: 5px solid #5865F2;
+	background: #5865F2;
 	color: white;
 }
 
@@ -61,10 +61,10 @@ input
 {
 	background: transparent;
 	color: white;
-	border: 1px solid #7289DA;
+	border: 1px solid #5865F2;
 }
 
 a
 {
-	color: #34d5eb;
+	color: #57F287;
 }
